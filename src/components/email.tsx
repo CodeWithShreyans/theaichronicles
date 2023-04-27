@@ -110,6 +110,7 @@ export const sendEmail = async (
         headers: {
             Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
         },
+        cache: "no-cache",
     });
 
     const emails = (await redisRes.json()) as RedisResponse;

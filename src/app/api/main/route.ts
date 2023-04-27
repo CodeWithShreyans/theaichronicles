@@ -62,6 +62,7 @@ const gpt = async () => {
             top_p: 1,
             n: 1,
         }),
+        cache: "no-cache",
     });
 
     if (!gptRes.ok) {
@@ -144,6 +145,7 @@ const email = async (email: string) => {
                 prompt: prompt,
                 size: "512x512",
             }),
+            cache: "no-cache",
         }
     );
 
@@ -183,3 +185,5 @@ export const GET = async (request: NextRequest) => {
     // return new NextResponse(JSON.stringify({ email, result }));
     return new NextResponse(result);
 };
+
+export const POST = GET;

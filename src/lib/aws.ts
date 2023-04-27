@@ -11,7 +11,9 @@ const client = new S3Client({
 });
 
 export const s3Upload = async (link: string) => {
-    const image = await fetch(link);
+    const image = await fetch(link, {
+        cache: "no-cache",
+    });
     const buffer = Buffer.from(await image.arrayBuffer());
 
     const key = randomUUID() + ".png";
