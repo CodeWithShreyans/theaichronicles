@@ -186,4 +186,18 @@ export const GET = async (request: NextRequest) => {
     return new NextResponse(result);
 };
 
-export const POST = GET;
+export const POST = async (request: NextRequest) => {
+    if (
+        process.env.NODE_ENV === "production" &&
+        request.nextUrl.searchParams.get("key") !== process.env.CRON_KEY
+    ) {
+        await error("Invalid key");
+        return new NextResponse("Invalid key", { status: 401 });
+    }
+
+    const generated = await gpt();
+
+    const result = await email(generated as string);
+
+    return new NextResponse(result);
+};
