@@ -1,0 +1,27 @@
+{
+    "name": "gptnl",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev && email dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+    },
+    "dependencies": {
+        "@aws-sdk/client-s3": "^3.321.1",
+        "@react-email/components": "^0.0.6",
+        "@types/node": "18.16.1",
+        "@types/react": "18.2.0",
+        "@types/react-dom": "18.2.1",
+        "next": "13.3.2-canary.11",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "react-email": "1.9.3",
+        "resend": "^0.13.1",
+        "typescript": "5.0.4"
+    },
+    "devDependencies": {
+        "install-peers": "^1.0.4"
+    }
+}
