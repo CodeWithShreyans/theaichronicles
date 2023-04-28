@@ -1,4 +1,3 @@
-import { error } from "@/lib/error";
 import {
     Html,
     Body,
@@ -10,6 +9,7 @@ import {
     Section,
     Link,
 } from "@react-email/components";
+import { captureMessage } from "@sentry/nextjs";
 import { Resend, type ErrorResponse } from "resend";
 
 type RedisResponse = {
@@ -113,13 +113,13 @@ export const sendEmail = async (
         cache: "no-cache",
     });
 
+    if (!redisRes.ok) {
+        return new Error(captureMessage("Redis Error\n" + redisRes.statusText));
+    }
+
     const emails = (await redisRes.json()) as RedisResponse;
 
     console.log(emails);
-
-    if (!redisRes.ok) {
-        error("Failed to fetch emails from redis\n" + redisRes.statusText);
-    }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -142,7 +142,7 @@ export const sendEmail = async (
     /* @ts-ignore Resend error check */
     if (resendRes.error) {
         /* @ts-ignore Resend error check */
-        error("Resend", resendRes.error);
+        return new Error(captureMessage("Resend Error\n", resendRes.error));
     }
 
     /* @ts-ignore Resend error check */

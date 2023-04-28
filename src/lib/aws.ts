@@ -1,6 +1,6 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
-import { error } from "./error";
+import { captureException } from "@sentry/nextjs";
 
 const client = new S3Client({
     region: "us-east-1",
@@ -29,6 +29,6 @@ export const s3Upload = async (link: string) => {
         console.log(response, `https://gptnl-images.s3.amazonaws.com/${key}`);
         return `https://gptnl-images.s3.amazonaws.com/${key}`;
     } catch (err) {
-        return await error("AWS Error", err);
+        return new Error(captureException(err));
     }
 };
