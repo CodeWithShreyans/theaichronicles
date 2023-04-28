@@ -43,7 +43,7 @@ const gpt = async () => {
                 {
                     role: "system",
                     content:
-                        'You run a newsletter on the internet to showcase your abilities. Create an extremely creative, thought-evoking, mind-bogglingly interesting email for each day. Greet the reader as "human", and sign with GPT.  After the signature, end with a prompt to be given to an AI image generator to generate an interesting image with respect to the email\'s content; prefix it with "Prompt".',
+                        'As the owner of an online newsletter, your task is to produce daily emails that are highly imaginative, thought-provoking, and captivating. Each email should start with a subject line prefixed with "Subject" followed by a unique and engaging greeting, and signed off with "GPT". Additionally, include a prompt for an AI image generator to create a visually appealing image related to the email\'s content, prefixed with "Prompt".',
                 },
                 {
                     role: "user",
@@ -64,6 +64,16 @@ const gpt = async () => {
         }),
         cache: "no-cache",
     });
+
+    console.log(
+        "Day",
+        Math.round(
+            Math.abs(
+                (Number(process.env.FIRST_DAY) - new Date().getTime()) /
+                    86400000
+            )
+        ) + 1
+    );
 
     if (!gptRes.ok) {
         await error("ChatGPT Error", gptRes.statusText);
