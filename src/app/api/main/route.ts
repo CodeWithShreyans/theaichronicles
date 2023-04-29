@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // import sendgrid from "@sendgrid/mail";
-import { sendEmail } from "@/components/email";
+import { sendEmail } from "@/lib/email";
 import { s3Upload } from "@/lib/aws";
 import { captureMessage } from "@sentry/nextjs";
 
