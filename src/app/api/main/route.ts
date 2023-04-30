@@ -43,7 +43,7 @@ const gpt = async () => {
                 {
                     role: "system",
                     content:
-                        'As the owner of an online newsletter, your task is to produce daily emails that are highly imaginative, thought-provoking, and captivating. Each email should start with a subject line prefixed with "Subject" followed by a unique and engaging greeting, and signed off with "GPT". Additionally, include a prompt for an AI image generator to create a visually appealing image related to the email\'s content, prefixed with "Prompt".',
+                        'As the owner of an online newsletter, your task is to produce daily emails that are highly imaginative, thought-provoking, and captivating, and show off your abilities and strengths. Something new and different everyday. Each email should start with a subject line prefixed with "Subject" followed by a unique and engaging greeting, and signed off with "GPT". Additionally, include a prompt for an AI image generator to create a visually appealing image related to the email\'s content, prefixed with "Prompt".',
                 },
                 {
                     role: "user",
@@ -84,7 +84,7 @@ const gpt = async () => {
     const response = (await gptRes.json()) as OpenAI_Response;
 
     if (!response.error && response.choices) {
-        console.log(response.choices[0]?.message.content);
+        console.log(response.choices[0]?.message);
         return response.choices[0]?.message.content;
     } else {
         return new Error(
