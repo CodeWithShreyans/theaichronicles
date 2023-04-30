@@ -6,7 +6,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             <head>
                 <Script
                     async
-                    src="https://umami-eight-sigma.vercel.app/script.js"
+                    src="https://analytics.shreyans.sh/script.js"
                     data-website-id="1ca7d183-bded-4285-960d-dbe4ced70615"
                 />
             </head>
