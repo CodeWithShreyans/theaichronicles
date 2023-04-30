@@ -1,17 +1,17 @@
+import { Fragment } from "react"
 import {
-    Html,
     Body,
-    Tailwind,
-    Head,
-    Img,
-    Text,
-    Hr,
-    Section,
-    Link,
-    Heading,
     Font,
-} from "@react-email/components";
-import { Fragment } from "react";
+    Head,
+    Heading,
+    Hr,
+    Html,
+    Img,
+    Link,
+    Section,
+    Tailwind,
+    Text,
+} from "@react-email/components"
 
 const Email = ({
     subject,
@@ -19,10 +19,10 @@ const Email = ({
     prompt,
     imgLink,
 }: {
-    subject?: string;
-    body?: string;
-    prompt?: string;
-    imgLink?: string;
+    subject?: string
+    body?: string
+    prompt?: string
+    imgLink?: string
 }) => {
     return (
         <Html>
@@ -48,14 +48,14 @@ const Email = ({
 
             <Tailwind>
                 <Body
-                    className="p-8 bg-[#05050a] font-normal rounded overflow-auto min-w-fit"
+                    className="min-w-fit overflow-auto rounded bg-[#05050a] p-8 font-normal"
                     // style={{
                     //     fontFamily: "Roboto, Helvetica",
                     //     fontWeight: 500,
                     // }}
                 >
                     <Section>
-                        <Heading className="text-4xl font-medium text-white/[.925] text-center my-2">
+                        <Heading className="my-2 text-center text-4xl font-medium text-white/[.925]">
                             The AI Chronicles
                         </Heading>
                         <Hr />
@@ -73,7 +73,7 @@ const Email = ({
                             }
                             width={512}
                             height={512}
-                            className="m-auto display-block my-4 rounded-lg"
+                            className="m-auto my-4 block rounded-lg"
                             // style={{ borderRadius: "0.5rem" }}
                         />
 
@@ -89,11 +89,11 @@ const Email = ({
                                             {line}
                                             <br />
                                         </Fragment>
-                                    );
+                                    )
                                 })}
                         </Text>
                     </Section>
-                    <Section className="text-white/[.615] pl-4">
+                    <Section className="pl-4 text-white/[.615]">
                         <Text>
                             <Link
                                 href="https://shreyans.sh"
@@ -113,7 +113,7 @@ const Email = ({
                 </Body>
             </Tailwind>
         </Html>
-    );
-};
+    )
+}
 
-export default Email;
+export default Email

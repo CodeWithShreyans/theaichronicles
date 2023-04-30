@@ -1,4 +1,14 @@
-import Script from "next/script";
+/* eslint-disable tailwindcss/no-custom-classname */
+import "./globals.css"
+import { Inter } from "next/font/google"
+import Script from "next/script"
+
+import { cn } from "@/lib/utils"
+
+const inter = Inter({
+    subsets: ["latin"],
+    preload: true,
+})
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -10,10 +20,17 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                     data-website-id="1ca7d183-bded-4285-960d-dbe4ced70615"
                 />
             </head>
-            <body>{children}</body>
+            <body
+                className={cn(
+                    "bg-root relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col justify-between px-4 text-white sm:px-8 md:max-w-7xl",
+                    inter.className
+                )}
+            >
+                {children}
+            </body>
         </html>
-    );
-};
+    )
+}
 
 export const metadata = {
     title: "The AI Chronicles",
@@ -40,6 +57,6 @@ export const metadata = {
             follow: true,
         },
     },
-};
+}
 
-export default RootLayout;
+export default RootLayout

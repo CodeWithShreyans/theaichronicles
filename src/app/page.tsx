@@ -1,5 +1,9 @@
 const Home = () => {
-    return <>Server-only Deployment</>;
-};
+    return (
+        <>
+            <p>Server-only Deployment</p>
+        </>
+    )
+}
 
-export default Home;
+export default Home

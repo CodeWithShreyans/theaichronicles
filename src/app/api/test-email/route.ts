@@ -1,5 +1,8 @@
-import { sendEmail } from "@/lib/email";
+import type { NextRequest } from "next/server"
 
-export const GET = () => {
-    sendEmail();
-};
+import { sendEmail } from "@/lib/email"
+
+export const GET = (request: NextRequest) => {
+    console.log(request.nextUrl.href)
+    sendEmail()
+}

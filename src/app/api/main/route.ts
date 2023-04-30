@@ -1,34 +1,33 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server"
+import { captureMessage } from "@sentry/nextjs"
 
-// import sendgrid from "@sendgrid/mail";
-import { sendEmail } from "@/lib/email";
-import { s3Upload } from "@/lib/aws";
-import { captureMessage } from "@sentry/nextjs";
+import { s3Upload } from "@/lib/aws"
+import { sendEmail } from "@/lib/email"
 
 type OpenAI_Response = {
     error?: {
-        message: string;
-        type: string;
-        param: string | null;
-        code: number | null;
-    };
-    id?: string;
-    object?: string;
-    created?: number;
-    model?: string;
+        message: string
+        type: string
+        param: string | null
+        code: number | null
+    }
+    id?: string
+    object?: string
+    created?: number
+    model?: string
     choices?: {
-        message: { role: string; content: string };
-        finish_reason: string;
-        index: number;
-    }[];
-};
+        message: { role: string; content: string }
+        finish_reason: string
+        index: number
+    }[]
+}
 
 type Image = {
-    created: number;
+    created: number
     data: {
-        url: string;
-    }[];
-};
+        url: string
+    }[]
+}
 
 const gpt = async () => {
     const gptRes = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -63,7 +62,7 @@ const gpt = async () => {
             n: 1,
         }),
         cache: "no-cache",
-    });
+    })
 
     console.log(
         "Day",
@@ -73,37 +72,37 @@ const gpt = async () => {
                     86400000
             )
         ) + 1
-    );
+    )
 
     if (!gptRes.ok) {
         return new Error(
             captureMessage("ChatGPT Fetch Error\n" + gptRes.statusText)
-        );
+        )
     }
 
-    const response = (await gptRes.json()) as OpenAI_Response;
+    const response = (await gptRes.json()) as OpenAI_Response
 
     if (!response.error && response.choices) {
-        console.log(response.choices[0]?.message);
-        return response.choices[0]?.message.content;
+        console.log(response.choices[0]?.message)
+        return response.choices[0]?.message.content
     } else {
         return new Error(
             captureMessage(
                 "ChatGPT Response Error\n" + JSON.stringify(response.error)
             )
-        );
+        )
     }
-};
+}
 
 const email = async (email: string) => {
     const subject = email.substring(
         email.indexOf("Subject") + 9,
         email.indexOf("\n")
-    );
+    )
     const body = email
         .substring(email.indexOf("\n") + 2, email.lastIndexOf("Prompt") - 2)
-        .replaceAll("\n", "\r\n");
-    const prompt = email.substring(email.lastIndexOf("Prompt") + 8);
+        .replaceAll("\n", "\r\n")
+    const prompt = email.substring(email.lastIndexOf("Prompt") + 8)
 
     const dalleRes = await fetch(
         "https://api.openai.com/v1/images/generations",
@@ -119,65 +118,63 @@ const email = async (email: string) => {
             }),
             cache: "no-cache",
         }
-    );
+    )
 
     if (!dalleRes.ok) {
-        return new Error(
-            captureMessage("Dall-E Error\n" + dalleRes.statusText)
-        );
+        return new Error(captureMessage("Dall-E Error\n" + dalleRes.statusText))
     }
 
-    const image = (await dalleRes.json()) as Image;
+    const image = (await dalleRes.json()) as Image
 
-    console.log(image);
+    console.log(image)
 
-    const imgLink = await s3Upload(image.data[0].url);
+    const imgLink = await s3Upload(image.data[0].url)
 
     if (imgLink instanceof Error) {
-        return imgLink;
+        return imgLink
     }
 
-    const resendRes = await sendEmail(subject, body, prompt, imgLink);
+    const resendRes = await sendEmail(subject, body, prompt, imgLink)
 
-    return resendRes;
-};
+    return resendRes
+}
 
 export const GET = async (request: NextRequest) => {
     if (
         process.env.NODE_ENV === "production" &&
         request.nextUrl.searchParams.get("key") !== process.env.CRON_KEY
     ) {
-        captureMessage("Invalid key");
-        return new NextResponse("Invalid key", { status: 401 });
+        captureMessage("Invalid key")
+        return new NextResponse("Invalid key", { status: 401 })
     }
 
-    const generated = await gpt();
+    const generated = await gpt()
 
-    const result = await email(generated as string);
+    const result = await email(generated as string)
 
     if (result instanceof Error) {
-        return result;
+        return result
     }
 
-    return new NextResponse(result);
-};
+    return new NextResponse(result)
+}
 
 export const POST = async (request: NextRequest) => {
     if (
         process.env.NODE_ENV === "production" &&
         request.nextUrl.searchParams.get("key") !== process.env.CRON_KEY
     ) {
-        captureMessage("Invalid key");
-        return new NextResponse("Invalid key", { status: 401 });
+        captureMessage("Invalid key")
+        return new NextResponse("Invalid key", { status: 401 })
     }
 
-    const generated = await gpt();
+    const generated = await gpt()
 
-    const result = await email(generated as string);
+    const result = await email(generated as string)
 
     if (result instanceof Error) {
-        return result;
+        return result
     }
 
-    return new NextResponse(result);
-};
+    return new NextResponse(result)
+}

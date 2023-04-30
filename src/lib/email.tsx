@@ -1,10 +1,11 @@
-import { captureMessage } from "@sentry/nextjs";
-import { Resend } from "resend";
-import Email from "@/emails/nl";
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import Email from "@/emails/nl"
+import { captureMessage } from "@sentry/nextjs"
+import { Resend } from "resend"
 
 type RedisResponse = {
-    result: string[];
-};
+    result: string[]
+}
 
 export const sendEmail = async (
     subject?: string,
@@ -17,17 +18,17 @@ export const sendEmail = async (
             Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
         },
         cache: "no-cache",
-    });
+    })
 
     if (!redisRes.ok) {
-        return new Error(captureMessage("Redis Error\n" + redisRes.statusText));
+        return new Error(captureMessage("Redis Error\n" + redisRes.statusText))
     }
 
-    const emails = (await redisRes.json()) as RedisResponse;
+    const emails = (await redisRes.json()) as RedisResponse
 
-    console.log(emails);
+    console.log(emails)
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = new Resend(process.env.RESEND_API_KEY)
 
     const resendRes = await resend.sendEmail({
         from: "The AI Chronicles <daily@ai.shreyans.sh>",
@@ -45,16 +46,16 @@ export const sendEmail = async (
                 body={body}
             />
         ),
-    });
+    })
 
-    console.log(resendRes);
+    console.log(resendRes)
 
     /* @ts-ignore Resend error check */
     if (resendRes.error) {
         /* @ts-ignore Resend error check */
-        return new Error(captureMessage("Resend Error\n", resendRes.error));
+        return new Error(captureMessage("Resend Error\n", resendRes.error))
     }
 
     /* @ts-ignore Resend error check */
-    return resendRes.id as string;
-};
+    return resendRes.id as string
+}
