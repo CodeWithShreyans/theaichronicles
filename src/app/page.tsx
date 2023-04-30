@@ -1,3 +1,5 @@
-export default function Home() {
+const Home = () => {
     return <>Server-only Deployment</>;
-}
+};
+
+export default Home;

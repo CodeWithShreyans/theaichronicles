@@ -30,7 +30,7 @@ export const sendEmail = async (
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const resendRes = await resend.sendEmail({
-        from: "The AI Chronicles <daily@shreyans.sh>",
+        from: "The AI Chronicles <daily@ai.shreyans.sh>",
         to: "shreyans@shreyans.sh",
         bcc: emails.result,
         reply_to: "shreyans@shreyans.sh",
