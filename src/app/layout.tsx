@@ -1,9 +1,12 @@
-/* eslint-disable tailwindcss/no-custom-classname */
 import "./globals.css"
 import { Inter } from "next/font/google"
 import Script from "next/script"
 
+import { ThemeProvider } from "@/lib/theme-provider"
 import { cn } from "@/lib/utils"
+import Footer from "@/components/footer"
+import Header from "@/components/header"
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({
     subsets: ["latin"],
@@ -13,20 +16,34 @@ const inter = Inter({
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <html lang="en">
-            <head>
-                <Script
-                    async
-                    src="https://analytics.shreyans.sh/script.js"
-                    data-website-id="1ca7d183-bded-4285-960d-dbe4ced70615"
-                />
-            </head>
-            <body
-                className={cn(
-                    "bg-root relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col justify-between px-4 text-white sm:px-8 md:max-w-7xl",
-                    inter.className
-                )}
-            >
-                {children}
+            {process.env.NODE_ENV === "production" ? (
+                <head>
+                    <Script
+                        async
+                        src="https://analytics.shreyans.sh/script.js"
+                        data-website-id="1ca7d183-bded-4285-960d-dbe4ced70615"
+                    />
+                </head>
+            ) : null}
+            <body>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="dark"
+                    enableSystem
+                >
+                    <div
+                        id="root"
+                        className={cn(
+                            "text-foreground relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col justify-between p-4 sm:px-8 md:max-w-7xl",
+                            inter.className
+                        )}
+                    >
+                        <Header />
+                        {children}
+                        <Footer />
+                    </div>
+                    <Toaster />
+                </ThemeProvider>
             </body>
         </html>
     )

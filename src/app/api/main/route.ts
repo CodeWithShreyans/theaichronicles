@@ -1,8 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server"
+import { Temporal } from "@js-temporal/polyfill"
+import { createClient } from "@sanity/client"
 import { captureMessage } from "@sentry/nextjs"
 
-import { s3Upload } from "@/lib/aws"
 import { sendEmail } from "@/lib/email"
+import { imageUpload } from "@/lib/r2"
 
 type OpenAI_Response = {
     error?: {
@@ -28,6 +30,34 @@ type Image = {
         url: string
     }[]
 }
+
+// export const dynamic = "force-dynamic"
+
+export const GET = async (request: NextRequest) => {
+    if (
+        process.env.NODE_ENV === "production" &&
+        request.nextUrl.searchParams.get("key") !== process.env.CRON_KEY
+    ) {
+        captureMessage("Invalid key")
+        return new NextResponse("Invalid key", { status: 401 })
+    }
+
+    const generated = await gpt()
+
+    const { subject, body, prompt } = extractData(generated)
+
+    const image = await dallE(prompt)
+
+    const imageLink = await imageUpload(image.data[0].url)
+
+    const emailResult = await email(subject, body, prompt, imageLink)
+
+    const postResult = await post(subject, body, prompt, imageLink)
+
+    return new NextResponse(JSON.stringify({ emailResult, postResult }))
+}
+
+export const POST = GET
 
 const gpt = async () => {
     const gptRes = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -75,7 +105,7 @@ const gpt = async () => {
     )
 
     if (!gptRes.ok) {
-        return new Error(
+        throw new Error(
             captureMessage("ChatGPT Fetch Error\n" + gptRes.statusText)
         )
     }
@@ -86,7 +116,7 @@ const gpt = async () => {
         console.log(response.choices[0]?.message)
         return response.choices[0]?.message.content
     } else {
-        return new Error(
+        throw new Error(
             captureMessage(
                 "ChatGPT Response Error\n" + JSON.stringify(response.error)
             )
@@ -94,16 +124,23 @@ const gpt = async () => {
     }
 }
 
-const email = async (email: string) => {
-    const subject = email.substring(
-        email.indexOf("Subject") + 9,
-        email.indexOf("\n")
+const extractData = (generated: string) => {
+    const subject = generated.substring(
+        generated.indexOf("Subject") + 9,
+        generated.indexOf("\n")
     )
-    const body = email
-        .substring(email.indexOf("\n") + 2, email.lastIndexOf("Prompt") - 2)
+    const body = generated
+        .substring(
+            generated.indexOf("\n") + 2,
+            generated.lastIndexOf("Prompt") - 2
+        )
         .replaceAll("\n", "\r\n")
-    const prompt = email.substring(email.lastIndexOf("Prompt") + 8)
+    const prompt = generated.substring(generated.lastIndexOf("Prompt") + 8)
 
+    return { subject, body, prompt }
+}
+
+const dallE = async (prompt: string) => {
     const dalleRes = await fetch(
         "https://api.openai.com/v1/images/generations",
         {
@@ -121,60 +158,58 @@ const email = async (email: string) => {
     )
 
     if (!dalleRes.ok) {
-        return new Error(captureMessage("Dall-E Error\n" + dalleRes.statusText))
+        throw new Error(captureMessage("Dall-E Error\n" + dalleRes.statusText))
     }
 
     const image = (await dalleRes.json()) as Image
 
     console.log(image)
 
-    const imgLink = await s3Upload(image.data[0].url)
+    return image
+}
 
-    if (imgLink instanceof Error) {
-        return imgLink
-    }
-
-    const resendRes = await sendEmail(subject, body, prompt, imgLink)
+const email = async (
+    subject: string,
+    body: string,
+    prompt: string,
+    imageLink: string
+) => {
+    const resendRes = await sendEmail(subject, body, prompt, imageLink)
 
     return resendRes
 }
 
-export const GET = async (request: NextRequest) => {
-    if (
-        process.env.NODE_ENV === "production" &&
-        request.nextUrl.searchParams.get("key") !== process.env.CRON_KEY
-    ) {
-        captureMessage("Invalid key")
-        return new NextResponse("Invalid key", { status: 401 })
-    }
+const post = async (
+    subject: string,
+    body: string,
+    prompt: string,
+    imageLink: string
+) => {
+    const client = createClient({
+        projectId: process.env.SANITY_PROJECT_ID,
+        dataset: "production",
+        useCdn: true,
+        apiVersion: Temporal.Now.plainDateISO("UTC").toString(),
+        token: process.env.SANITY_TOKEN,
+    })
 
-    const generated = await gpt()
+    const bodyArr = body.split("\r\n")
 
-    const result = await email(generated as string)
+    bodyArr.filter((line, index) => {
+        if (line === "") {
+            bodyArr.splice(index, 1)
+        }
+    })
 
-    if (result instanceof Error) {
-        return result
-    }
+    const result = await client.create({
+        _type: "post",
+        title: subject,
+        image: { url: imageLink, alt: prompt },
+        publishedAt: Temporal.Now.plainDateTimeISO("UTC").toString(),
+        body: bodyArr,
+    })
 
-    return new NextResponse(result)
-}
+    console.log(result)
 
-export const POST = async (request: NextRequest) => {
-    if (
-        process.env.NODE_ENV === "production" &&
-        request.nextUrl.searchParams.get("key") !== process.env.CRON_KEY
-    ) {
-        captureMessage("Invalid key")
-        return new NextResponse("Invalid key", { status: 401 })
-    }
-
-    const generated = await gpt()
-
-    const result = await email(generated as string)
-
-    if (result instanceof Error) {
-        return result
-    }
-
-    return new NextResponse(result)
+    return result
 }
