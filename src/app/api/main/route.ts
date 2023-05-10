@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server"
 import { Temporal } from "@js-temporal/polyfill"
 import { createClient } from "@sanity/client"
 import { captureMessage } from "@sentry/nextjs"
+import kv from "upstash-kv"
 
 import { sendEmail } from "@/lib/email"
 import { imageUpload } from "@/lib/r2"
@@ -31,7 +32,10 @@ type Image = {
     }[]
 }
 
-// export const dynamic = "force-dynamic"
+let messagesArr: {
+    role: string
+    content: string
+}[]
 
 export const GET = async (request: NextRequest) => {
     if (
@@ -54,12 +58,24 @@ export const GET = async (request: NextRequest) => {
 
     const postResult = await post(subject, body, prompt, imageLink)
 
+    kv.set("messages", JSON.stringify(messagesArr))
+
     return new NextResponse(JSON.stringify({ emailResult, postResult }))
 }
 
 export const POST = GET
 
 const gpt = async () => {
+    const messages = (await kv.get("messages")) as string
+    messagesArr = JSON.parse(messages) as {
+        role: string
+        content: string
+    }[]
+    messagesArr.push({
+        role: "user",
+        content: `Day 2`,
+    })
+
     const gptRes = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -68,26 +84,27 @@ const gpt = async () => {
         },
         body: JSON.stringify({
             model: "gpt-4",
-            messages: [
-                {
-                    role: "system",
-                    content:
-                        'As the owner of an online newsletter, your task is to produce daily emails that are highly imaginative, thought-provoking, and captivating, and show off your abilities and strengths. Something new and different everyday. Each email should start with a subject line prefixed with "Subject" followed by a unique and engaging greeting, and signed off with "GPT". Additionally, include a prompt for an AI image generator to create a visually appealing image related to the email\'s content, prefixed with "Prompt".',
-                },
-                {
-                    role: "user",
-                    content: `Day ${
-                        Math.round(
-                            Math.abs(
-                                (Number(process.env.FIRST_DAY) -
-                                    new Date().getTime()) /
-                                    86400000
-                            )
-                        ) + 1
-                    }`,
-                },
-            ],
-            temperature: 1,
+            // messages: [
+            //     {
+            //         role: "system",
+            //         content:
+            //             'As the owner of an online newsletter, your task is to produce daily emails that are highly imaginative, thought-provoking, and captivating, and show off your abilities and strengths. Something new and different everyday. Each email should start with a subject line prefixed with "Subject" followed by a unique and engaging greeting, and signed off with "GPT". Additionally, include a prompt for an AI image generator to create a visually appealing image related to the email\'s content, prefixed with "Prompt".',
+            //     },
+            //     {
+            //         role: "user",
+            //         content: `Day ${
+            //             Math.round(
+            //                 Math.abs(
+            //                     (Number(process.env.FIRST_DAY) -
+            //                         new Date().getTime()) /
+            //                         86400000
+            //                 )
+            //             ) + 1
+            //         }`,
+            //     },
+            // ],
+            messages: messagesArr,
+            temperature: 0.8,
             top_p: 1,
             n: 1,
         }),
@@ -125,17 +142,15 @@ const gpt = async () => {
 }
 
 const extractData = (generated: string) => {
-    const subject = generated.substring(
-        generated.indexOf("Subject") + 9,
-        generated.indexOf("\n")
-    )
-    const body = generated
-        .substring(
-            generated.indexOf("\n") + 2,
-            generated.lastIndexOf("Prompt") - 2
-        )
-        .replaceAll("\n", "\r\n")
-    const prompt = generated.substring(generated.lastIndexOf("Prompt") + 8)
+    const json = JSON.parse(generated) as {
+        subject: string
+        body: string
+        image: string
+    }
+
+    const subject = json.subject
+    const body = json.body.replaceAll("\n", "\r\n")
+    const prompt = json.image
 
     return { subject, body, prompt }
 }

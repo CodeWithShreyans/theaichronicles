@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 
 const Footer = () => {
     return (
-        <footer className="animate-footer-up flex items-center justify-between">
+        <footer className="animate-footer-up flex flex-col items-center justify-between sm:flex-row">
             <div className="flex flex-col items-start justify-evenly">
                 <div>
                     <Button variant="ghost" asChild>

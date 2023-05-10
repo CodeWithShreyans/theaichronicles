@@ -3,5 +3,6 @@
     "typescript.enablePromptUseWorkspaceTsdk": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
-    }
+    },
+    "cSpell.words": ["theaichronicles"]
 }

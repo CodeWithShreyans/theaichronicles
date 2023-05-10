@@ -2,24 +2,27 @@
 import Email from "@/emails/nl"
 import { captureMessage } from "@sentry/nextjs"
 import { Resend } from "resend"
+import kv from "upstash-kv"
 
-type RedisResponse = {
-    result: string[]
-}
+// type RedisResponse = {
+//     result: string[]
+// }
 
 const getEmails = async () => {
-    const redisRes = await fetch("https://heroic-koi-31101.upstash.io/keys/*", {
-        headers: {
-            Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
-        },
-        cache: "no-cache",
-    })
+    // const redisRes = await fetch("https://heroic-koi-31101.upstash.io/keys/*", {
+    //     headers: {
+    //         Authorization: `Bearer ${process.env.UPSTASH_REST_API_URL}`,
+    //     },
+    //     cache: "no-cache",
+    // })
 
-    if (!redisRes.ok) {
-        throw new Error(captureMessage("Redis Error\n" + redisRes.statusText))
-    }
+    // if (!redisRes.ok) {
+    //     throw new Error(captureMessage("Redis Error\n" + redisRes.statusText))
+    // }
 
-    const emails = (await redisRes.json()) as RedisResponse
+    // const emails = (await redisRes.json()) as RedisResponse
+
+    const emails = await kv.keys("*")
 
     console.log(emails)
 
@@ -39,7 +42,7 @@ export const sendEmail = async (
     const resendRes = await resend.sendEmail({
         from: "The AI Chronicles <daily@ai.shreyans.sh>",
         to: "shreyans@shreyans.sh",
-        bcc: emails.result,
+        bcc: emails,
         reply_to: "shreyans@shreyans.sh",
         subject:
             subject ||
