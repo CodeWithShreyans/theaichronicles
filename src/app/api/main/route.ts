@@ -19,7 +19,18 @@ type OpenAI_Response = {
     created?: number
     model?: string
     choices?: {
-        message: { role: string; content: string }
+        message: {
+            role: string
+            content: string
+            function_call: { name: string; arguments: string }
+            // {
+            //     arguments: {
+            //         subject: string
+            //         body: string
+            //         prompt: string
+            //     }
+            // }
+        }
         finish_reason: string
         index: number
     }[]
@@ -32,10 +43,20 @@ type Image = {
     }[]
 }
 
-let messagesArr: {
-    role: string
-    content: string
-}[]
+const day = {
+    role: "user",
+    content: `Day ${
+        new Temporal.Duration(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            Temporal.Now.instant().epochSeconds - 1690984800,
+        ).round("day").days + 1
+    }`,
+}
 
 export const GET = async (request: NextRequest) => {
     if (
@@ -46,9 +67,10 @@ export const GET = async (request: NextRequest) => {
         return new NextResponse("Invalid key", { status: 401 })
     }
 
-    const generated = await gpt()
+    const { message, json } = await gpt()
 
-    const { subject, body, prompt } = extractData(generated)
+    const { subject, body, prompt } = json
+    // extractData(generated.content)
 
     const image = await dallE(prompt)
 
@@ -58,7 +80,7 @@ export const GET = async (request: NextRequest) => {
 
     const postResult = await post(subject, body, prompt, imageLink)
 
-    kv.set("messages", JSON.stringify(messagesArr))
+    kv.rpush("messages", day, message)
 
     return new NextResponse(JSON.stringify({ emailResult, postResult }))
 }
@@ -66,15 +88,15 @@ export const GET = async (request: NextRequest) => {
 export const POST = GET
 
 const gpt = async () => {
-    const messages = (await kv.get("messages")) as string
-    messagesArr = JSON.parse(messages) as {
-        role: string
-        content: string
-    }[]
-    messagesArr.push({
-        role: "user",
-        content: `Day 2`,
-    })
+    const messages = await kv.lrange<{ role: string; content: string }>(
+        "messages",
+        0,
+        -1,
+    )
+
+    messages.push(day)
+
+    console.log(messages)
 
     const gptRes = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
@@ -103,57 +125,93 @@ const gpt = async () => {
             //         }`,
             //     },
             // ],
-            messages: messagesArr,
+            messages: messages,
+            functions: [
+                {
+                    name: "print",
+                    description:
+                        "Prints the newsletter for the specified day in a human readable format",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            subject: {
+                                type: "string",
+                                description: "The subject of the newsletter",
+                            },
+                            body: {
+                                type: "string",
+                                description: "The body of the newsletter",
+                            },
+                            prompt: {
+                                type: "string",
+                                description:
+                                    "The prompt for the image generator",
+                            },
+                        },
+                        required: ["subject", "body", "image"],
+                    },
+                },
+            ],
+            function_call: { name: "print" },
             temperature: 0.8,
             top_p: 1,
             n: 1,
         }),
-        cache: "no-cache",
+        cache: process.env.NODE_ENV === "production" ? "no-cache" : "default",
     })
 
-    console.log(
-        "Day",
-        Math.round(
-            Math.abs(
-                (Number(process.env.FIRST_DAY) - new Date().getTime()) /
-                    86400000
-            )
-        ) + 1
-    )
+    // console.log(
+    //     "Day",
+    //     Math.round(
+    //         Math.abs((Number(1690986600) - new Date().getTime()) / 86400),
+    //     ) + 1,
+    // )
 
     if (!gptRes.ok) {
         throw new Error(
-            captureMessage("ChatGPT Fetch Error\n" + gptRes.statusText)
+            captureMessage("ChatGPT Fetch Error\n" + gptRes.statusText),
         )
     }
 
     const response = (await gptRes.json()) as OpenAI_Response
 
     if (!response.error && response.choices) {
-        console.log(response.choices[0]?.message)
-        return response.choices[0]?.message.content
+        console.log("TEST 1:\n", response.choices[0]?.message.function_call)
+        console.log(
+            "TEST 2:\n",
+            JSON.parse(response.choices[0]?.message.function_call.arguments),
+        )
+
+        return {
+            message: response.choices[0].message,
+            json: await JSON.parse(
+                response.choices[0].message.function_call.arguments,
+            ),
+        }
     } else {
         throw new Error(
             captureMessage(
-                "ChatGPT Response Error\n" + JSON.stringify(response.error)
-            )
+                "ChatGPT Response Error\n" + JSON.stringify(response.error),
+            ),
         )
     }
 }
 
-const extractData = (generated: string) => {
-    const json = JSON.parse(generated) as {
-        subject: string
-        body: string
-        image: string
-    }
+// const extractData = (generated: string) => {
+//     const json = JSON.parse(generated.replaceAll("\n", "\\n")) as {
+//         subject: string
+//         body: string
+//         image: string
+//     }
 
-    const subject = json.subject
-    const body = json.body.replaceAll("\n", "\r\n")
-    const prompt = json.image
+//     console.log(JSON.stringify({ raw: json.body }))
 
-    return { subject, body, prompt }
-}
+//     const subject = json.subject
+//     const body = json.body
+//     const prompt = json.image
+
+//     return { subject, body, prompt }
+// }
 
 const dallE = async (prompt: string) => {
     const dalleRes = await fetch(
@@ -169,7 +227,7 @@ const dallE = async (prompt: string) => {
                 size: "512x512",
             }),
             cache: "no-cache",
-        }
+        },
     )
 
     if (!dalleRes.ok) {
@@ -187,7 +245,7 @@ const email = async (
     subject: string,
     body: string,
     prompt: string,
-    imageLink: string
+    imageLink: string,
 ) => {
     const resendRes = await sendEmail(subject, body, prompt, imageLink)
 
@@ -198,7 +256,7 @@ const post = async (
     subject: string,
     body: string,
     prompt: string,
-    imageLink: string
+    imageLink: string,
 ) => {
     const client = createClient({
         projectId: process.env.SANITY_PROJECT_ID,

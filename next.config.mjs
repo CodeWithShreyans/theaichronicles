@@ -5,6 +5,13 @@ const nextConfig = {
     experimental: {
         serverActions: true,
     },
+    images: {
+        remotePatterns: [
+            {
+                hostname: "images.ai.shreyans.sh",
+            },
+        ],
+    },
 }
 
 export default withSentryConfig(

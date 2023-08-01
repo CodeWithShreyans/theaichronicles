@@ -34,7 +34,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                     <div
                         id="root"
                         className={cn(
-                            "text-foreground relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col justify-between p-4 sm:px-8 md:max-w-7xl",
+                            "relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col justify-between p-4 text-foreground sm:px-8 md:max-w-7xl",
                             inter.className
                         )}
                     >

@@ -64,11 +64,11 @@ const config = {
                     from: { height: "var(--radix-accordion-content-height)" },
                     to: { height: 0 },
                 },
-                "footer-up": {
+                up: {
                     from: { transform: "translateY(0.5rem)", opacity: 0 },
                     to: { transform: "translateY(0)", opacity: 1 },
                 },
-                "header-down": {
+                down: {
                     from: { transform: "translateY(-0.5rem)", opacity: 0 },
                     to: { transform: "translateY(0)", opacity: 1 },
                 },
@@ -80,10 +80,8 @@ const config = {
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
-                "footer-up":
-                    "footer-up 1s ease-in-out 0s 1 normal none running",
-                "header-down":
-                    "header-down 1s ease-in-out 0s 1 normal none running",
+                up: "up 1s ease-in-out 0s 1 normal none running",
+                down: "down 1s ease-in-out 0s 1 normal none running",
                 "landing-title":
                     "landing-title 1s ease-in-out 0s 1 normal none running",
             },

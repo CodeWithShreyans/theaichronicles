@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 
 const Footer = () => {
     return (
-        <footer className="animate-footer-up flex flex-col items-center justify-between sm:flex-row">
+        <footer className="mt-4 flex animate-up flex-col items-center justify-between sm:flex-row">
             <div className="flex flex-col items-start justify-evenly">
                 <div>
                     <Button variant="ghost" asChild>
@@ -39,7 +39,7 @@ const Footer = () => {
                 <Link
                     href="https://shreyans.sh"
                     target="_blank"
-                    className="hover:text-foreground/80 cursor-pointer"
+                    className="cursor-pointer hover:text-foreground/80"
                 >
                     Shreyans Jain
                 </Link>

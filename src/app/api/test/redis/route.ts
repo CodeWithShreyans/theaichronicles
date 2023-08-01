@@ -1,7 +1,39 @@
-import kv from "upstash-kv"
+import { Temporal } from "@js-temporal/polyfill"
+
+// import { Temporal } from "@js-temporal/polyfill"
+// import kv from "upstash-kv"
 
 export const GET = async () => {
     if (process.env.NODE_ENV === "production") return
+
+    console.log(
+        new Temporal.Duration(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            Temporal.Now.instant().epochSeconds - 1690984800,
+        ).round("day").days + 1,
+    )
+
+    // console.log(kv.rpop("messages"))
+    // console.log(Temporal.Now.instant().epochSeconds - 1683753780)
+
+    // console.log(Temporal.Now.instant().epochSeconds)
+
+    // console.log(
+    //     new Temporal.Duration(
+    //         0,
+    //         0,
+    //         0,
+    //         0,
+    //         0,
+    //         0,
+    //         Temporal.Now.instant().epochSeconds - 1683676800
+    //     ).round("day").days
+    // )
 
     // await kv.del("messages")
 
@@ -23,14 +55,26 @@ export const GET = async () => {
     //     }
     // )
 
-    const data = await kv.lrange<object>("messages", 0, -1)
+    // let data = await kv.lrange<{ role: string; content: string }>(
+    //     "messages",
+    //     0,
+    //     -1
+    // )
 
-    console.log(
-        (data[0] as { role: string; content: string }).content.replaceAll(
-            "\n",
-            "\\n"
-        )
-    )
+    // // data.forEach((data) => console.log(data.content.replaceAll("\n", "\\n")))
+    // // console.log(JSON.parse(data[2].content.replaceAll("\n", "\\n")))
+
+    // data = data.filter((value) => {
+    //     return value.role === "assistant"
+    // })
+
+    // const parsed: { subject: string; body: string; image: string }[] | [] = []
+
+    // data.forEach((value, index) => {
+    //     parsed[index] = JSON.parse(value.content.replaceAll("\n", "\\n"))
+    // })
+
+    // console.log(parsed[0].body)
 
     // console.log(data)
 

@@ -5,7 +5,7 @@ import Form from "./headerForm"
 
 const Header = () => {
     return (
-        <header className="animate-header-down flex flex-col items-center justify-between gap-4 sm:h-24 sm:flex-row">
+        <header className="animate-down mb-4 flex flex-col items-center justify-between gap-4 sm:h-24 sm:flex-row">
             <Link href="/">
                 <svg
                     strokeMiterlimit="10"

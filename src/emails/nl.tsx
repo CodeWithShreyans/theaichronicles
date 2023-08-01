@@ -55,9 +55,11 @@ const Email = ({
                     // }}
                 >
                     <Section>
-                        <Heading className="my-2 text-center text-4xl font-medium text-white/[.925]">
-                            The AI Chronicles
-                        </Heading>
+                        <Link href="https://ai.shreyans.sh">
+                            <Heading className="my-2 text-center text-4xl font-medium text-white/[.925]">
+                                The AI Chronicles
+                            </Heading>
+                        </Link>
                         <Hr />
                     </Section>
                     <Section>
@@ -80,9 +82,9 @@ const Email = ({
                         <Text className="px-4 pt-4 text-xl text-white/[.925]">
                             {(
                                 body ||
-                                "Hello there, Mind Adventurer!\r\n\r\nToday, I invite you to embark on a journey – a quest to unlock the hidden powers of your mind. It's time to unleash the depths of your imagination and break the chains that have been holding you back from your true potential.\r\n\r\nThink of your mind as an ocean; on the surface, everything might look calm and serene, but beneath the waves lies a vast, untapped world of wonder, discovery, and power. Like a submarine, it's time to dive deep into the dark and mysterious corners of your mind, where treasures of intellect, creativity, and self-awareness lie buried beneath layers of self-doubt and fear.\r\n\r\nHere's an exercise to start tapping into those hidden depths: find a comfortable spot, away from distractions, and give yourself five minutes to free-write. What does this mean? Just write. Don't worry about structure, grammar, or coherence – just let your thoughts spill onto the page without inhibition. The ideas might be wild or ridiculous, but that's the magic of it. You never know what you might uncover in those uncharted territories of your own mind.\r\n\r\nTake time today to unlock that secret door inside you, and as you do, notice the wind of change in your thoughts, your perspectives, and your life. Keep exploring and stay curious, Mind Adventurer. Always remember, there's so much more to discover in the depths.\r\n\r\nWith warmest regards,\r\nGPT"
+                                "Hello there, Mind Adventurer!\n\nToday, I invite you to embark on a journey – a quest to unlock the hidden powers of your mind. It's time to unleash the depths of your imagination and break the chains that have been holding you back from your true potential.\n\nThink of your mind as an ocean; on the surface, everything might look calm and serene, but beneath the waves lies a vast, untapped world of wonder, discovery, and power. Like a submarine, it's time to dive deep into the dark and mysterious corners of your mind, where treasures of intellect, creativity, and self-awareness lie buried beneath layers of self-doubt and fear.\n\nHere's an exercise to start tapping into those hidden depths: find a comfortable spot, away from distractions, and give yourself five minutes to free-write. What does this mean? Just write. Don't worry about structure, grammar, or coherence – just let your thoughts spill onto the page without inhibition. The ideas might be wild or ridiculous, but that's the magic of it. You never know what you might uncover in those uncharted territories of your own mind.\n\nTake time today to unlock that secret door inside you, and as you do, notice the wind of change in your thoughts, your perspectives, and your life. Keep exploring and stay curious, Mind Adventurer. Always remember, there's so much more to discover in the depths.\n\nWith warmest regards,\nGPT"
                             )
-                                .split("\r\n")
+                                .split("\n")
                                 .map((line, index) => {
                                     return (
                                         <Fragment key={index}>
@@ -96,14 +98,8 @@ const Email = ({
                     <Section className="pl-4 text-white/[.615]">
                         <Text>
                             <Link
-                                href="https://shreyans.sh"
-                                className="text-white/[.615] hover:text-white/[.725]"
-                            >
-                                <span>By</span> Shreyans Jain
-                            </Link>{" "}
-                            <br />
-                            <Link
-                                href="https://goo.gl/maps/87XvA3vj787HZHtY7"
+                                // TODO: Add link to unsubscribe
+                                href="https://ai.shreyans.sh"
                                 className="text-white/[.615] hover:text-white/[.725]"
                             >
                                 Unsubscribe

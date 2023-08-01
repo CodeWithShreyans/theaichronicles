@@ -22,7 +22,7 @@ const getEmails = async () => {
 
     // const emails = (await redisRes.json()) as RedisResponse
 
-    const emails = await kv.keys("*")
+    const emails = await kv.lrange<string>("emails", 0, -1)
 
     console.log(emails)
 
@@ -64,7 +64,6 @@ export const sendEmail = async (
         /* @ts-ignore Resend error check */
         throw new Error(captureMessage("Resend Error\n", resendRes.error))
     }
-
-    /* @ts-ignore Resend error check */
+    
     return resendRes.id as string
 }
