@@ -64,9 +64,9 @@ const Form = () => {
                 disabled={formState === "loading" || formState === "submitted"}
                 className={
                     formState === "submitted"
-                        ? "text-destructive-foreground bg-green-600"
+                        ? "bg-green-600 text-destructive-foreground"
                         : formState === "error"
-                        ? "text-destructive-foreground bg-red-600"
+                        ? "bg-red-600 text-destructive-foreground"
                         : ""
                 }
             >

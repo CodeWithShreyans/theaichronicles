@@ -1,13 +1,14 @@
-import { Fragment, Suspense } from "react"
+/* eslint-disable jsx-a11y/alt-text */
+// import { Fragment, Suspense } from "react"
 import { Temporal } from "@js-temporal/polyfill"
 import { createClient } from "@sanity/client"
-import { Image } from "@unpic/react/next"
 import { Balancer } from "react-wrap-balancer"
 
-import { Button } from "@/components/ui/button"
+// import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import Image from "./Image"
 
-type Post = {
+export type Post = {
     _rev: string
     _type: string
     body: string[]
@@ -28,7 +29,7 @@ const PostsPage = async () => {
     })
 
     const posts: Post[] = await sanityClient.fetch(
-        '*[_type == "post"] | order(publishedAt desc)'
+        '*[_type == "post"] | order(publishedAt desc)',
     )
 
     return (
@@ -45,7 +46,7 @@ const PostsPage = async () => {
                             </h1>
                             <p className="">
                                 {Temporal.PlainDate.from(
-                                    value.publishedAt
+                                    value.publishedAt,
                                 ).toLocaleString(undefined, {
                                     day: "numeric",
                                     month: "long",
@@ -53,16 +54,9 @@ const PostsPage = async () => {
                                 })}
                             </p>
                         </div>
-
                         <Separator className="m-4" />
 
-                        <Image
-                            src={value.image.url}
-                            alt={value.image.alt}
-                            width={512}
-                            height={512}
-                            className="m-2 rounded-lg"
-                        />
+                        <Image value={value} />
                         {/* <img src={value.image.url} alt={value.image.alt} /> */}
                         <text className="mx-12 my-4 flex flex-col gap-4 text-lg">
                             {value.body.map((value, index) => (
