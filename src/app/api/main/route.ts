@@ -53,7 +53,7 @@ const day = {
             0,
             0,
             0,
-            Temporal.Now.instant().epochSeconds - 1690984800,
+            Temporal.Now.instant().epochSeconds - Number(process.env.FIRST_DAY),
         ).round("day").days + 1
     }`,
 }
