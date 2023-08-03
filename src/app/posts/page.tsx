@@ -1,12 +1,9 @@
-/* eslint-disable jsx-a11y/alt-text */
-// import { Fragment, Suspense } from "react"
+import Image from "next/image"
 import { Temporal } from "@js-temporal/polyfill"
 import { createClient } from "@sanity/client"
 import { Balancer } from "react-wrap-balancer"
 
-// import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import Image from "./Image"
 
 export type Post = {
     _rev: string
@@ -56,7 +53,13 @@ const PostsPage = async () => {
                         </div>
                         <Separator className="m-4" />
 
-                        <Image value={value} />
+                        <Image
+                            src={value.image.url}
+                            alt={value.image.alt}
+                            width={512}
+                            height={512}
+                            className="m-2 rounded-lg"
+                        />
                         {/* <img src={value.image.url} alt={value.image.alt} /> */}
                         <text className="mx-12 my-4 flex flex-col gap-4 text-lg">
                             {value.body.map((value, index) => (
