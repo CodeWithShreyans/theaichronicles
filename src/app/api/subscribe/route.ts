@@ -15,7 +15,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     await kv.lrem("emails", 0, email)
-    const set = await kv.rpushx("emails")
+    const set = await kv.rpushx("emails", email)
     // const redisRes = await fetch(
     //     `https://heroic-koi-31101.upstash.io/set/${
     //         (

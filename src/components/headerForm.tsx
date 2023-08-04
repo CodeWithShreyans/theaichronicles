@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { captureMessage } from "@sentry/nextjs"
 import { ArrowRightIcon, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -35,6 +36,11 @@ const Form = () => {
                         })
                     } else {
                         setFormState("error")
+                        throw Error(
+                            captureMessage(
+                                `${res.status} + ${res.statusText}}`,
+                            ),
+                        )
                     }
                 })
 
