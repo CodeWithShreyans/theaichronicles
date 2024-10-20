@@ -10,7 +10,7 @@ const Footer = () => {
                 <div>
                     <Button variant="ghost" asChild>
                         <Link
-                            href="https://github.com/destroyerxyz"
+                            href="https://github.com/CodeWithShreyans"
                             target="_blank"
                         >
                             <GithubIcon />
@@ -26,7 +26,7 @@ const Footer = () => {
                     </Button>
                     <Button variant="ghost" asChild>
                         <Link
-                            href="https://twitter.com/Destroyer_Xyz"
+                            href="https://twitter.com/CodeWShreyans"
                             target="_blank"
                         >
                             <TwitterIcon />

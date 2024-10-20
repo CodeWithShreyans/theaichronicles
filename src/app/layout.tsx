@@ -1,4 +1,5 @@
 import "./globals.css"
+
 import { Inter } from "next/font/google"
 import Script from "next/script"
 
@@ -35,7 +36,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                         id="root"
                         className={cn(
                             "relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col justify-between p-4 text-foreground sm:px-8 md:max-w-7xl",
-                            inter.className
+                            inter.className,
                         )}
                     >
                         <Header />
@@ -56,11 +57,11 @@ export const metadata = {
     viewport: "width=device-width, initial-scale=1",
     description: "A newsletter curated by AI",
     referrer: "origin-when-cross-origin",
-    metadataBase: new URL("https://ai.shreyans.sh"),
+    metadataBase: new URL("https://taic.shreyans.sh"),
     openGraph: {
         type: "website",
         locale: "en_US",
-        url: "https://ai.shreyans.sh",
+        url: "https://taic.shreyans.sh",
         title: "The AI Chronicles",
         description: "A newsletter curated by AI",
         siteName: "The AI Chronicles",

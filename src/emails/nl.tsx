@@ -55,7 +55,7 @@ const Email = ({
                     // }}
                 >
                     <Section>
-                        <Link href="https://ai.shreyans.sh">
+                        <Link href="https://taic.shreyans.sh">
                             <Heading className="my-2 text-center text-4xl font-medium text-white/[.925]">
                                 The AI Chronicles
                             </Heading>
@@ -99,7 +99,7 @@ const Email = ({
                         <Text>
                             <Link
                                 // TODO: Add link to unsubscribe
-                                href="https://ai.shreyans.sh"
+                                href="https://taic.shreyans.sh"
                                 className="text-white/[.615] hover:text-white/[.725]"
                             >
                                 Unsubscribe
